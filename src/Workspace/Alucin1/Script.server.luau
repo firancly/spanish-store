@@ -91,7 +91,7 @@ local function shop()
 	moveToPosition(door.HitBox.Position)
 	task.wait(0.5)
 
-	local itemCount = math.random(2) -- Max products npc can buy
+	local itemCount = math.random(5) -- Max products npc can buy
 
 	for _ = 1, itemCount do
 		local randomItem = shopItems[math.random(1, #shopItems)]
@@ -108,8 +108,6 @@ local function shop()
 	end
 	print(shoppingList)
 	moveToCheckout()
-
-	print("moved to checkout")
 end
 
 shop()
@@ -117,16 +115,10 @@ shop()
 local dispatch = game.Workspace.Caja:WaitForChild("Despachado")
 
 while dispatch.Value == false do
-	print("waiting")
 	task.wait(2)
 end
 
 if dispatch.Value == true then
-	print("Going to exit")
 	moveToPosition(door.HitBox2.Position)
 	NPC:Destroy()
-end
-
-for _, item in shoppingList do
-	print(item.Name)
 end
