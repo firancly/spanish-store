@@ -30,12 +30,12 @@ confirmarButton.MouseButton1Click:Connect(function()
 			end
 		end
 
-		for _, jugador in ipairs(game.Players:GetPlayers()) do
-			local oxxo = game.Workspace.TiendaStats:FindFirstChild("Oxxo")
-			if oxxo then
-				oxxo.Value = oxxo.Value + (productosProcesados * 10)
-			end
-		end
+		--for _, jugador in ipairs(game.Players:GetPlayers()) do
+		--	local oxxo = game.Workspace.TiendaStats:FindFirstChild("Oxxo")
+		--	if oxxo then
+		--		oxxo.Value = oxxo.Value + (productosProcesados * 10)
+		--	end
+		--end
 	else
 		confirmarButton.Text = "NO SE HAN PROCESADO TODOS LOS PRODUCTOS"
 		wait(2)

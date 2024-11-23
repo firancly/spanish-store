@@ -4,66 +4,136 @@ local animationId = "rbxassetid://140361369670309"
 local soundId = "rbxassetid://4934272176"
 
 local cashier = workspace:WaitForChild("Caja")
-local pantalla = cashier:WaitForChild("Pantalla")
-local surfaceGui = pantalla:WaitForChild("SurfaceGui")
-local frame = surfaceGui:WaitForChild("Frame")
-local templateTextLabel = frame:WaitForChild("OXXO")
 
 local contadorTextLabels = 0
+
+local cashierSpots = {
+	cashier1 = workspace:WaitForChild("CashierPosition"),
+	cashier2 = workspace:WaitForChild("CashierPosition2"),
+}
+
+local monitorSpots = {
+	monitor1 = workspace:WaitForChild("Caja"),
+	monitor2 = workspace:WaitForChild("Caja2"),
+}
+
+local productSpots = {
+	products = workspace:WaitForChild("productSpot1"),
+	products2 = workspace:WaitForChild("productSpot2"),
+}
+
+local function disableMovement(humanoid)
+	humanoid.WalkSpeed = 0
+	humanoid.JumpPower = 0
+	humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+end
+
+local function findClosestCashier(item)
+	local closestCashier = nil
+	local closestDistance = math.huge
+
+	for _, cashier in pairs(cashierSpots) do
+		local distance = (cashier.Position - item.Position).Magnitude
+		if distance < closestDistance then
+			closestDistance = distance
+			closestCashier = cashier
+		end
+	end
+
+	return closestCashier
+end
+
+local function findClosestMonitor(item)
+	local closestMonitor = nil
+	local closestDistance = math.huge
+
+	for _, monitor in pairs(monitorSpots) do
+		local distance = (monitor.Pantalla.Position - item.Position).Magnitude
+		if distance < closestDistance then
+			closestDistance = distance
+			closestMonitor = monitor
+		end
+	end
+
+	return closestMonitor
+end
+
+local function findClosestProduct(item)
+	local closestProduct = nil
+	local closestDistance = math.huge
+
+	for _, product in pairs(productSpots) do
+		local distance = (product.Position - item.Position).Magnitude
+		if distance < closestDistance then
+			closestDistance = distance
+			closestProduct = product
+		end
+	end
+
+	return closestProduct
+end
 
 local function activar(jugador)
 	if jugador.Team and jugador.Team.Name == "CAJERO" then
 		local personaje = jugador.Character
-		local humanoide = personaje:FindFirstChildOfClass("Humanoid")
+		local humanoid = personaje:FindFirstChildOfClass("Humanoid")
+		local closestCashier = findClosestCashier(item)
+		local closestMonitor = findClosestMonitor(item)
+		local closestProduct = findClosestProduct(item)
 
-		if humanoide then
-			humanoide.WalkSpeed = 0
-			humanoide.JumpPower = 0
-			humanoide:SetStateEnabled(Enum.HumanoidStateType.Jumping, false)
+		local screen = closestMonitor:WaitForChild("Pantalla")
+		local surfaceGui = screen:WaitForChild("SurfaceGui")
+		local frame = surfaceGui:WaitForChild("Frame")
+		local templateTextLabel = frame:WaitForChild("OXXO")
 
-			local animador = humanoide:FindFirstChild("Animator") or humanoide:WaitForChild("Animator")
+		if humanoid then
+			disableMovement(humanoid)
 
-			for _, track in ipairs(animador:GetPlayingAnimationTracks()) do
+			-- Stop all the animations
+			local animator = humanoid:FindFirstChild("Animator") or humanoid:WaitForChild("Animator")
+			for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
 				track:Stop()
 			end
 
+			-- Create a new animation
 			local animacion = Instance.new("Animation")
 			animacion.AnimationId = animationId
-			local pistaAnimacion = animador:LoadAnimation(animacion)
+			local trackAnimation = animator:LoadAnimation(animacion)
 
+			trackAnimation:Play()
+
+			-- Create a new sound
 			local sonido = Instance.new("Sound")
 			sonido.SoundId = soundId
 			sonido.Parent = personaje.HumanoidRootPart
 
-			pistaAnimacion:Play()
-
-			wait(0.5)
+			-- wait(0.5)
 			item.Anchored = false
 			item.CanCollide = false
 
-			jugador.Character.HumanoidRootPart.CFrame = game.Workspace.CF.CFrame
+			-- Move the player to cashier position
+			print(closestCashier.CFrame)
+			jugador.Character.HumanoidRootPart.CFrame = closestCashier.CFrame
 
-			local mano = personaje:FindFirstChild("LeftHand") or personaje:WaitForChild("LeftHand")
+			local hand = personaje:FindFirstChild("LeftHand") or personaje:WaitForChild("LeftHand")
 
 			local motor = Instance.new("Motor6D")
-			motor.Part0 = mano
+			motor.Part0 = hand
 			motor.Part1 = item
-			motor.C0 = mano.CFrame:Inverse()
+			motor.C0 = hand.CFrame:Inverse()
 			motor.C1 = item.CFrame:Inverse()
-			motor.Parent = mano
+			motor.Parent = hand
 			wait(0.8)
 			sonido:Play()
 
-			pistaAnimacion.Stopped:Wait()
 			item:Destroy()
 
-			humanoide.WalkSpeed = 16
-			humanoide.JumpPower = 50
-			humanoide:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+			humanoid.WalkSpeed = 16
+			humanoid.JumpPower = 50
+			humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 
-			local productos = workspace:FindFirstChild("productSpot1")
-			if productos then
-				local numValue = productos:FindFirstChild("Num")
+			if closestProduct then
+				local numValue = closestProduct:FindFirstChild("Num")
 				if numValue then
 					numValue.Value = numValue.Value - 1
 				end
@@ -85,3 +155,6 @@ local function activar(jugador)
 end
 
 ProximityPrompt.Triggered:Connect(activar)
+
+-- Detect Position
+-- Change text label depending on the position

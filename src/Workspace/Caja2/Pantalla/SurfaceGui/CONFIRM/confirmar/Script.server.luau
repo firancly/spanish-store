@@ -1,6 +1,6 @@
 local surfaceGui = script.Parent.Parent.Parent.Frame
 local confirmarButton = script.Parent
-local productos = game.Workspace:FindFirstChild("ProductSpot2")
+local productos = game.Workspace:FindFirstChild("productSpot2")
 local numValue = productos:FindFirstChild("Num")
 local despachao = game.Workspace.Caja2:WaitForChild("Despachado")
 
@@ -30,12 +30,12 @@ confirmarButton.MouseButton1Click:Connect(function()
 			end
 		end
 
-		for _, jugador in ipairs(game.Players:GetPlayers()) do
-			local oxxo = jugador.leaderstats and jugador.leaderstats:FindFirstChild("OXXO")
-			if oxxo then
-				oxxo.Value = oxxo.Value + (productosProcesados * 10) 
-			end
-		end
+		--for _, jugador in ipairs(game.Players:GetPlayers()) do
+		--	local oxxo = jugador.leaderstats and jugador.leaderstats:FindFirstChild("OXXO")
+		--	if oxxo then
+		--		oxxo.Value = oxxo.Value + (productosProcesados * 10) 
+		--	end
+		--end
 
 	else
 		confirmarButton.Text = "NO SE HAN PROCESADO TODOS LOS PRODUCTOS"
