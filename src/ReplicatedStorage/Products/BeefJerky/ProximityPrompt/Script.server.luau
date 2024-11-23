@@ -41,7 +41,7 @@ local function activar(jugador)
 			item.Anchored = false
 			item.CanCollide = false
 
-			jugador.Character.HumanoidRootPart.CFrame = game.Workspace.CF2.CFrame
+			jugador.Character.HumanoidRootPart.CFrame = game.Workspace.CF.CFrame
 
 			local mano = personaje:FindFirstChild("LeftHand") or personaje:WaitForChild("LeftHand")
 
@@ -61,7 +61,7 @@ local function activar(jugador)
 			humanoide.JumpPower = 50
 			humanoide:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
 
-			local productos = workspace:FindFirstChild("productos2")
+			local productos = workspace:FindFirstChild("productSpot1")
 			if productos then
 				local numValue = productos:FindFirstChild("Num")
 				if numValue then
