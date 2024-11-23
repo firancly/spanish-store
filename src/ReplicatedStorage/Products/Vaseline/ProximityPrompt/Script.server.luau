@@ -3,11 +3,11 @@ local parteADestruir = script.Parent.Parent
 local idAnimacion = "rbxassetid://140361369670309"
 local idSonido = "rbxassetid://4934272176"
 
-local caja = workspace:WaitForChild("Caja2")
+local caja = workspace:WaitForChild("Caja")
 local pantalla = caja:WaitForChild("Pantalla")
 local surfaceGui = pantalla:WaitForChild("SurfaceGui")
 local frame = surfaceGui:WaitForChild("Frame")
-local templateTextLabel = frame:WaitForChild("OXXO") 
+local templateTextLabel = frame:WaitForChild("OXXO")
 
 local contadorTextLabels = 0
 
@@ -57,7 +57,6 @@ local function activar(jugador)
 			pistaAnimacion.Stopped:Wait()
 			parteADestruir:Destroy()
 
-
 			humanoide.WalkSpeed = 16
 			humanoide.JumpPower = 50
 			humanoide:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
@@ -71,17 +70,16 @@ local function activar(jugador)
 			end
 
 			if templateTextLabel then
-				local nuevoTextLabel = templateTextLabel:Clone()  
+				local nuevoTextLabel = templateTextLabel:Clone()
 				nuevoTextLabel.Name = "TextLabel"
-				nuevoTextLabel.Parent = frame  
+				nuevoTextLabel.Parent = frame
 
-				nuevoTextLabel.Text = "[ + ]" .. parteADestruir.Name  
+				nuevoTextLabel.Text = "[ + ]" .. parteADestruir.Name
 
-				nuevoTextLabel.Position = UDim2.new(0, 0, 0, contadorTextLabels * 	10)  
+				nuevoTextLabel.Position = UDim2.new(0, 0, 0, contadorTextLabels * 10)
 
 				contadorTextLabels = contadorTextLabels + 1
 			end
-
 		end
 	end
 end
