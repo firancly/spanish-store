@@ -1,6 +1,6 @@
 local surfaceGui = script.Parent.Parent.Parent.Frame
 local confirmarButton = script.Parent
-local productos = game.Workspace:FindFirstChild("productos2")
+local productos = game.Workspace:FindFirstChild("ProductSpot2")
 local numValue = productos:FindFirstChild("Num")
 local despachao = game.Workspace.Caja2:WaitForChild("Despachado")
 

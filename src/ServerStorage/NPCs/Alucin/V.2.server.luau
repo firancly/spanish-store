@@ -1,4 +1,4 @@
- --[[
+--[[
          Yeicxb System 
                  .     '     
               _________
@@ -18,7 +18,7 @@
 
 local productosRecolectados = {}
 
-local posiciones = workspace:WaitForChild("Posiciones") 
+local posiciones = workspace:WaitForChild("Posiciones")
 local isProcessing = false
 local colaDeNPCs = {}
 local npc = script.Parent
@@ -30,14 +30,28 @@ local itemsDuplicados = game.ReplicatedStorage:WaitForChild("itemsDuplicados")
 
 -----------------------------------------------------------------------------
 local productosDisponibles = {
-	"Desodorante", "Galon", "Vasitos", "Papel", "Bebida", 
-	"Gaseosa", "Prime", "Takis", "Cereal", "Doritos", 
-	"Carne", "Tarjetas" , "Snapple" , "Nutrileche", 
-	"fiji" , "Oreo" , "Vaselina" , "chips"
+	"Desodorante",
+	"Galon",
+	"Vasitos",
+	"Papel",
+	"Bebida",
+	"Gaseosa",
+	"Prime",
+	"Takis",
+	"Cereal",
+	"Doritos",
+	"Carne",
+	"Tarjetas",
+	"Snapple",
+	"Nutrileche",
+	"fiji",
+	"Oreo",
+	"Vaselina",
+	"chips",
 }
 
 local function asignarProductosAleatorios()
-	local cantidadDeProductos = math.random(1, 5) 
+	local cantidadDeProductos = math.random(1, 5)
 	local productosAsignados = {}
 
 	while #productosAsignados < cantidadDeProductos do
@@ -60,12 +74,10 @@ local listaDeCompras = asignarProductosAleatorios()
 
 ---------------------------------------------------------------------
 
-
 local tiendaAbierta = true
 local humanoid = npc:FindFirstChildOfClass("Humanoid")
 
 -----------------------------------------------------------------
-
 
 local walkAnim = Instance.new("Animation")
 local walkingAnimId = "rbxassetid://107953179942800"
@@ -75,7 +87,7 @@ humanoid.WalkSpeed = 8
 local caja = workspace:WaitForChild("Caja")
 local valorCola = caja:WaitForChild("Cola")
 -------------------------------------------------------------------
-local physicsService = game:GetService('PhysicsService')
+local physicsService = game:GetService("PhysicsService")
 
 local groupNameNPC = "NPCs"
 local groupNameProtecciones = "protecciones"
@@ -105,14 +117,14 @@ if not successVidrio then
 	physicsService:CreateCollisionGroup(groupNameVidrio)
 end
 
-physicsService:CollisionGroupSetCollidable(groupNameNPC, 'Default', false)
+physicsService:CollisionGroupSetCollidable(groupNameNPC, "Default", false)
 physicsService:CollisionGroupSetCollidable(groupNameNPC, groupNameNPC, false)
 physicsService:CollisionGroupSetCollidable(groupNameNPC, groupNameProtecciones, true)
-physicsService:CollisionGroupSetCollidable(groupNameNPC, groupNameVidrio, false) 
+physicsService:CollisionGroupSetCollidable(groupNameNPC, groupNameVidrio, false)
 
 local function setNPCCollisionGroup(npc)
 	for _, part in ipairs(npc:GetDescendants()) do
-		if part:IsA('BasePart') and part.Name ~= "HumanoidRootPart" then
+		if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
 			physicsService:SetPartCollisionGroup(part, groupNameNPC)
 		end
 	end
@@ -122,7 +134,7 @@ setNPCCollisionGroup(npc)
 
 local function setProteccionesCollisionGroup()
 	for _, part in ipairs(workspace:GetDescendants()) do
-		if part:IsA('BasePart') and part.Name == "protecciones" then
+		if part:IsA("BasePart") and part.Name == "protecciones" then
 			physicsService:SetPartCollisionGroup(part, groupNameProtecciones)
 		end
 	end
@@ -132,15 +144,13 @@ setProteccionesCollisionGroup()
 
 local function setVidrioCollisionGroup()
 	for _, part in ipairs(workspace:GetDescendants()) do
-		if part:IsA('BasePart') and part.Name == "Vidrio" then
+		if part:IsA("BasePart") and part.Name == "Vidrio" then
 			physicsService:SetPartCollisionGroup(part, groupNameVidrio)
 		end
 	end
 end
 
 setVidrioCollisionGroup()
-
-
 
 ----------------------------------------------------------------------
 
@@ -158,142 +168,133 @@ local cantidadvariedad = workspace.Stands:WaitForChild("NeveraVariedad")
 local cantidadtarjeta = workspace.Stands:WaitForChild("EstanteriaTarjetas")
 
 local cantidadfiji = workspace.Stands:WaitForChild("NeveraAgua")
-local cantidadleche =  workspace.Stands:WaitForChild("NeveraLeche")
+local cantidadleche = workspace.Stands:WaitForChild("NeveraLeche")
 
-local cantidadsnaple =  workspace.Stands:WaitForChild("EstanteriaJugo")
-local cantidadvase =  workspace.Stands:WaitForChild("EstanteriaVaselina")
-local cantidadOreo =  workspace.Stands:WaitForChild("EstanteriaOreo")
+local cantidadsnaple = workspace.Stands:WaitForChild("EstanteriaJugo")
+local cantidadvase = workspace.Stands:WaitForChild("EstanteriaVaselina")
+local cantidadOreo = workspace.Stands:WaitForChild("EstanteriaOreo")
 
 local cantidadchips = workspace.Stands:WaitForChild("EstanteriaChips")
 
-
-
-
 ------------------------------------------------------------------------------------------------------
 
-
 local function actualizarContador()
-	local contadorDoritosGUI = workspace.Stands.EstanteDoritos.aviso.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteDoritos.aviso.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadDoritos.Cantidad.Value) .. "/10"
 	end
 end
 
 local function actualizarContadorCereal()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaCereal.aviso2.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaCereal.aviso2.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadcereal.CantidadCereal.Value) .. "/12"
 	end
 end
 
 local function actualizarContadorPapitas()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaPapitas.aviso3.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaPapitas.aviso3.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadpapitas.CantidadPapitas.Value) .. "/15"
 	end
 end
 
 local function actualizarContadorCarne()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaCarne.aviso4.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaCarne.aviso4.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadcarne.CantidadCarne.Value) .. "/12"
 	end
 end
 
 local function actualizarContadorPapel()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaPapel.aviso5.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaPapel.aviso5.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadpapel.CantidadPapel.Value) .. "/20"
 	end
 end
 local function actualizarContadorGaseosa()
-	local contadorDoritosGUI = workspace.Stands.NeveraGaseosa.aviso6.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.NeveraGaseosa.aviso6.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(neveragaseosa.CantidadGaseosas.Value) .. "/36"
 	end
 end
 local function actualizarContadorvasitos()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaVasos.aviso7.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaVasos.aviso7.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadvasos.CantidadVasos.Value) .. "/24"
 	end
 end
 local function actualizarContadoPrime()
-	local contadorDoritosGUI = workspace.Stands.NeveraPrime.aviso8.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.NeveraPrime.aviso8.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(neveraprime.CantidadPrime.Value) .. "/36"
 	end
 end
 
 local function actualizarContadorGalones()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaGalones.aviso9.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaGalones.aviso9.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadgalones.CantidadGalon.Value) .. "/20"
 	end
 end
 local function actualizarContadorDeso()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaDesodorante.aviso10.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaDesodorante.aviso10.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidaddeso.CantidadDeso.Value) .. "/36"
 	end
 end
 local function actualizarContadorVariedad()
-	local contadorDoritosGUI = workspace.Stands.NeveraVariedad.aviso11.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.NeveraVariedad.aviso11.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadvariedad.CantidadVariedad.Value) .. "/30"
 	end
 end
 
 local function actualizarContadorTarjeta()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaTarjetas.aviso12.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaTarjetas.aviso12.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadtarjeta.CantidadTarjeta.Value) .. "/5"
 	end
 end
 local function actualizarContadorLeche()
-	local contadorDoritosGUI = workspace.Stands.NeveraLeche.avisoleshe.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.NeveraLeche.avisoleshe.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadleche.CantidadLeches.Value) .. "/12"
 	end
 end
 local function actualizarContadorAgua()
-	local contadorDoritosGUI = workspace.Stands.NeveraAgua.avisoagua.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.NeveraAgua.avisoagua.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadfiji.CantidadAgua.Value) .. "/15"
 	end
 end
 
 local function actualizarContadorOreo()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaOreo.avisoorito.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaOreo.avisoorito.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadOreo.CantidadOreo.Value) .. "/12"
 	end
 end
 
 local function actualizarContadorjugo()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaJugo.avisosnaple.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaJugo.avisosnaple.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadsnaple.CantidadJugo.Value) .. "/10"
 	end
 end
 local function actualizarContadorVaselina()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaVaselina.avisovase.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaVaselina.avisovase.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadvase.CantidadVase.Value) .. "/25"
 	end
 end
 
-
 local function actualizarContadorChips()
-	local contadorDoritosGUI = workspace.Stands.EstanteriaChips.avisochips.SurfaceGui.TextLabel  
+	local contadorDoritosGUI = workspace.Stands.EstanteriaChips.avisochips.SurfaceGui.TextLabel
 	if contadorDoritosGUI then
 		contadorDoritosGUI.Text = tostring(cantidadchips.CantidadChip.Value) .. "/20"
 	end
 end
-
-
-
-
 
 ------------------------------------------------------------------------------------------------------
 local productos = game.Workspace:FindFirstChild("productos")
@@ -303,10 +304,7 @@ local despachao = game.Workspace.Caja:WaitForChild("Despachado")
 local function removerDeCola()
 	valorCola.Value = 0
 	game.Workspace.Bools.Cajero.Value = false
-
 end
-
-
 
 local function moverHacia2(posicion)
 	local path = pathfindingService:CreatePath({
@@ -358,8 +356,6 @@ local function moverHacia(posicion)
 	end
 end
 
-
-
 local function actualizarYVerificarSalida()
 	despachao.Changed:Connect(function()
 		if despachao.Value then
@@ -375,17 +371,12 @@ local function actualizarYVerificarSalida()
 	end)
 end
 
-
-
-
-
-
 local function moverProductosAlCajero()
 	local offset = Vector3.new(0.4, 0, 0)
 	local contador = 0
 
 	for _, item in pairs(productosRecolectados) do
-		local productosDuplicados = itemsDuplicados:GetChildren() 
+		local productosDuplicados = itemsDuplicados:GetChildren()
 		local productosConNombreIgual = {}
 
 		for _, producto in pairs(productosDuplicados) do
@@ -420,14 +411,13 @@ end
 
 ----------------------------------------------------------------------
 local function agregarACola()
-
-	valorCola.Value = 1  
+	valorCola.Value = 1
 	moverHacia2(cajero.Position)
-	npc.HumanoidRootPart.CFrame = CFrame.new(npc.HumanoidRootPart.Position, npc.HumanoidRootPart.Position + Vector3.new(0, 0, -1))
+	npc.HumanoidRootPart.CFrame =
+		CFrame.new(npc.HumanoidRootPart.Position, npc.HumanoidRootPart.Position + Vector3.new(0, 0, -1))
 	task.wait(1)
 
 	moverProductosAlCajero()
-
 end
 
 local function esperarHastaQueEsteDisponible()
@@ -435,7 +425,7 @@ local function esperarHastaQueEsteDisponible()
 		local connection
 		connection = valorCola:GetPropertyChangedSignal("Value"):Connect(function()
 			if valorCola.Value == 0 then
-				connection:Disconnect() 
+				connection:Disconnect()
 				agregarACola()
 			end
 		end)
@@ -444,8 +434,6 @@ local function esperarHastaQueEsteDisponible()
 	end
 end
 ----------------------------------------------------------------------
-
-
 
 local function moverHaciaCajero(posicion)
 	local path = pathfindingService:CreatePath({
@@ -488,7 +476,7 @@ local function moverHaciaCajero(posicion)
 					connection = game:GetService("RunService").Heartbeat:Connect(function()
 						if (npc.HumanoidRootPart.Position - initialPosition).Magnitude > 1 then
 							pos.Value = false
-							connection:Disconnect()  
+							connection:Disconnect()
 						end
 					end)
 
@@ -497,13 +485,10 @@ local function moverHaciaCajero(posicion)
 			end
 
 			wait(0.5)
-			
 		end
 	end
 	esperarHastaQueEsteDisponible()
-
 end
-
 
 -------------------------------------------------------------------------
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -514,10 +499,8 @@ local humanoid = npc:FindFirstChildOfClass("Humanoid")
 local animator = humanoid:FindFirstChildOfClass("Animator") or Instance.new("Animator", humanoid)
 
 local animacionCompra = Instance.new("Animation")
-animacionCompra.AnimationId = "rbxassetid://115184381574114" 
+animacionCompra.AnimationId = "rbxassetid://115184381574114"
 local animTrack = animator:LoadAnimation(animacionCompra)
-
-
 
 local function realizarCompra()
 	local itemsConfig = {
@@ -539,7 +522,6 @@ local function realizarCompra()
 		Nutrileche = { cantidad = cantidadleche.CantidadLeches, actualizar = actualizarContadorLeche },
 		Snapple = { cantidad = cantidadsnaple.CantidadJugo, actualizar = actualizarContadorjugo },
 		chips = { cantidad = cantidadchips.CantidadChip, actualizar = actualizarContadorChips },
-
 	}
 
 	for _, item in pairs(listaDeCompras) do
@@ -563,15 +545,11 @@ local function realizarCompra()
 			end
 		end
 	end
-
 end
 
 ------------------------------------------------------------------------
 
-
 local function comprarEnTienda()
-
-
 	moverHacia2(hitq.Position)
 	task.wait(0.1)
 
@@ -580,12 +558,6 @@ local function comprarEnTienda()
 	moverHaciaCajero(cajero.Position)
 
 	task.wait(0.1)
-	
-
-	
-
-
 end
-
 
 comprarEnTienda()

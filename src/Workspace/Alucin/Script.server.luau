@@ -1,5 +1,6 @@
 local PathfindingService = game:GetService("PathfindingService")
 local PhysicsService = game:GetService("PhysicsService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local NPC = script.Parent
 local itemStands = workspace:WaitForChild("ItemStands")
@@ -9,6 +10,7 @@ local cashier2 = workspace:WaitForChild("CashierSpot2")
 local cashier1Bool = workspace.Bools:WaitForChild("Cashier1")
 local cashier2Bool = workspace.Bools:WaitForChild("Cashier2")
 
+local shoppingList = {}
 local shopItems = {
 	{ Name = "Doritos", Position = itemStands.Doritos.aviso.Position + Vector3.new(2, 0, 0) },
 	{ Name = "BeefJerky", Position = itemStands.BeefJerky.aviso.Position + Vector3.new(2, 0, 0) },
@@ -52,13 +54,36 @@ local function moveToPosition(targetPosition)
 	end
 end
 
+local products = game.ReplicatedStorage:WaitForChild("Products")
+local function moveProductsToCashier(spot) -- counter spot
+	local offset = Vector3.new(1, 0, 0)
+	local itemCounter = 0
+
+	-- Remove when interacted with them
+	-- Press confirm to finish transaction
+
+	for _, item in ipairs(shoppingList) do
+		itemCounter += 1
+		spot.Num.Value += 1
+		local itemDuplicate = products:WaitForChild(item.Name):Clone()
+
+		itemDuplicate.Parent = spot
+		itemDuplicate.Position = spot.Position + offset * itemCounter
+		itemDuplicate.Name = item.Name
+	end
+end
+
 local function moveToCheckout()
 	if cashier1Bool.Value == false then
+		local productSpot1 = workspace:FindFirstChild("productSpot1")
 		moveToPosition(cashier1.Position)
 		cashier1Bool.Value = true
+		moveProductsToCashier(productSpot1)
 	elseif cashier2Bool.Value == false then
+		local productSpot2 = workspace:FindFirstChild("productSpot2")
 		moveToPosition(cashier2.Position)
 		cashier2Bool.Value = true
+		moveProductsToCashier(productSpot2)
 	end
 end
 
@@ -66,7 +91,6 @@ local function shop()
 	moveToPosition(door.HitBox.Position)
 	task.wait(0.5)
 
-	local shoppingList = {}
 	local itemCount = math.random(5)
 
 	for _ = 1, itemCount do
@@ -87,3 +111,6 @@ local function shop()
 end
 
 shop()
+for _, item in shoppingList do
+	print(item.Name)
+end

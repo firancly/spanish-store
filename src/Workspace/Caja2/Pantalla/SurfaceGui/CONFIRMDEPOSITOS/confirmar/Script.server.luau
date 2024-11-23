@@ -7,7 +7,7 @@ local despachao = game.Workspace.Caja2:WaitForChild("Despachado")
 local cooldownTime = 2
 local isCooldown = false 
 local FRAMEDEPOS = script.Parent.Parent.Parent.FrameDepositos
-local products = game.Workspace.productos 
+local products = game.Workspace:FindFirstChild("ProductSpot2") 
 
 confirmarButton.MouseButton1Click:Connect(function()
 	if isCooldown then
