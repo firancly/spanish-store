@@ -1,60 +1,69 @@
 local RunService = game:GetService("RunService")
-local StarterGui = game:GetService("StarterGui")
-local npcsFolder1 = StarterGui:WaitForChild("NPCs")
-local npcsFolder2 = StarterGui:WaitForChild("NPCs2")
-local puntoDeInicio1 = workspace:WaitForChild("PuntoDeInicio")
-local puntoDeInicio2 = workspace:WaitForChild("PuntoDeInicio2")
+local ServerStorage = game:GetService("ServerStorage")
+local PhysicsService = game:GetService("PhysicsService")
 
-local TIEMPO_DUPLICACION = 2
-local MAX_NPCS = 3
+local MAX_NPCS = 4
+local SPAWN_DELAY = 2
+local lastSpawnTime = 0
 
-local function calcularNPCsRestantes(puntoDeInicio)
-	return math.max(0, MAX_NPCS - #puntoDeInicio:GetChildren())
+local NPCFolder = ServerStorage:WaitForChild("NPCs")
+local NPCModels = NPCFolder:GetChildren()
+local spawnLocation = workspace:WaitForChild("NPCSpawn")
+local activeNPC = workspace:WaitForChild("ActiveNPC")
+
+
+local function createCollisionGroup(name)
+	local success, _ = pcall(function()
+		PhysicsService:CreateCollisionGroup(name)
+	end)
+	return success
 end
 
-local function obtenerNPCsAleatorios(npcs, cantidad)
-	local seleccionados = {}
-	local indicesUsados = {}
-	while #seleccionados < cantidad and #seleccionados < #npcs do
-		local indice = math.random(1, #npcs)
-		if not indicesUsados[indice] then
-			table.insert(seleccionados, npcs[indice])
-			indicesUsados[indice] = true
+createCollisionGroup("Players")
+createCollisionGroup("NPCs")
+
+PhysicsService:CollisionGroupSetCollidable("Players", "NPCs", false)
+
+
+local function countNPCs()
+	local count = 0
+	for _, obj in ipairs(activeNPC:GetChildren()) do
+		if obj:IsA("Model") then
+			count += 1
 		end
 	end
-	return seleccionados
+	return count
 end
 
-local function duplicarNPC(npc, destino)
-	local nuevoNPC = npc:Clone()
-	nuevoNPC.Parent = destino
+local function spawnNPC()
+	local currentTime = tick()
+	if currentTime - lastSpawnTime < SPAWN_DELAY then
+		return
+	end
+
+	local newNPC = NPCModels[math.random(1, #NPCModels)]:Clone()
+
+	local randomOffset = Vector3.new(math.random(-2, 2), 0, math.random(-2, 2))
+
+	newNPC:PivotTo(spawnLocation.CFrame * CFrame.new(randomOffset))
+	newNPC.Parent = activeNPC
+
+	lastSpawnTime = currentTime
 end
 
-if npcsFolder1 and npcsFolder2 and puntoDeInicio1 and puntoDeInicio2 then
-	local tiempoAcumulado = 0
+local function manageNPCs()
+	local currentNPCs = countNPCs()
 
-	RunService.Heartbeat:Connect(function(deltaTime)
-		tiempoAcumulado += deltaTime
-		if tiempoAcumulado >= TIEMPO_DUPLICACION then
-			tiempoAcumulado = 0
-
-			local cantidadRestante1 = calcularNPCsRestantes(puntoDeInicio1)
-			if cantidadRestante1 > 0 then
-				local npcsAleatorios1 = obtenerNPCsAleatorios(npcsFolder1:GetChildren(), cantidadRestante1)
-				for _, npc in ipairs(npcsAleatorios1) do
-					duplicarNPC(npc, puntoDeInicio1)
-				end
-			end
-
-			local cantidadRestante2 = calcularNPCsRestantes(puntoDeInicio2)
-			if cantidadRestante2 > 0 then
-				local npcsAleatorios2 = obtenerNPCsAleatorios(npcsFolder2:GetChildren(), cantidadRestante2)
-				for _, npc in ipairs(npcsAleatorios2) do
-					duplicarNPC(npc, puntoDeInicio2)
-				end
-			end
-		end
-	end)
-else
-	warn("Alguna de las carpetas o puntos de inicio no se encontraron, deteniendo duplicación.")
+	if currentNPCs < MAX_NPCS then
+		spawnNPC()
+	end
 end
+
+for _ = 1, MAX_NPCS do
+	task.wait(SPAWN_DELAY)
+	spawnNPC()
+end
+
+RunService.Heartbeat:Connect(function()
+	manageNPCs()
+end)

@@ -45,4 +45,5 @@ confirmarButton.MouseButton1Click:Connect(function()
 	wait(cooldownTime)
 	isCooldown = false
 	confirmarButton.Text = "CONFIRMAR"
+	despachao.Value = false
 end)
