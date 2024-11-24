@@ -30,13 +30,13 @@ local shopItems = {
 	{ Name = "Papel", Position = itemStands.Papel.aviso.Position + Vector3.new(-2, 0, 0) },
 }
 
--- Local variables that will be unique to each NPC instance
+-- Local variables that will be unique to each NPC
 local function createNPCState()
 	return {
 		shoppingList = {},
 		isAtCashier = false,
 		currentCashier = nil,
-		npcModel = nil, -- Changed from npc to npcModel for clarity
+		npcModel = nil,
 	}
 end
 
@@ -57,6 +57,24 @@ local function moveToPosition(npcState, targetPosition)
 
 	if success and path.Status == Enum.PathStatus.Success then
 		local waypoints = path:GetWaypoints()
+
+		local closestPlayer = nil
+		local closestDistance = math.huge
+
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if player.Character then
+				local distance = (
+					player.Character.HumanoidRootPart.Position - npcState.npcModel.HumanoidRootPart.Position
+				).Magnitude
+
+				if distance < closestDistance then
+					closestDistance = distance
+					closestPlayer = player
+					print(closestPlayer)
+				end
+			end
+		end
+
 		for _, waypoint in ipairs(waypoints) do
 			if not npcState.npcModel.Parent then
 				return
@@ -334,9 +352,8 @@ local function shop(npcState)
 	end
 end
 
--- Main initialization function
 function NPCShoppingModule.init(npc)
-	-- Set up collision groups
+	-- Collision groups
 	for _, part in ipairs(npc:GetDescendants()) do
 		if part:IsA("BasePart") then
 			part.CollisionGroup = "NPCs"
@@ -345,9 +362,8 @@ function NPCShoppingModule.init(npc)
 
 	-- Create state for this NPC instance
 	local npcState = createNPCState()
-	npcState.npcModel = npc -- Changed to npcModel for clarity
+	npcState.npcModel = npc
 
-	-- Start shopping behavior
 	shop(npcState)
 end
 
