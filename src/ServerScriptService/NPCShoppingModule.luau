@@ -30,6 +30,18 @@ local shopItems = {
 	{ Name = "Papel", Position = itemStands.Papel.aviso.Position + Vector3.new(-2, 0, 0) },
 }
 
+-- local shopNPCposOffsets = {
+-- 	[2] = {"Doritios", "Carne", "Snapple", "Oreo", "Desodorante", "Galon"},
+-- 	[-2] = {"Takis", "Cereal", "Vaselina", "Chips", "Vasitos", "Papel"}
+--   }
+
+-- for offset, names in shopNPCposOffsets do
+-- local vecOffset = Vector3.new(offset, 0, 0)
+-- for _, name in names do
+-- 	local aviso = itemStands[name].aviso
+-- 	table.insert(shopItems, {Name = name, Position = aviso.Position + vecOffset})
+-- end
+
 -- Local variables that will be unique to each NPC
 local function createNPCState()
 	return {
