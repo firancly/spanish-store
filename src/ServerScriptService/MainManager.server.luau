@@ -11,7 +11,6 @@ local NPCModels = NPCFolder:GetChildren()
 local spawnLocation = workspace:WaitForChild("NPCSpawn")
 local activeNPC = workspace:WaitForChild("ActiveNPC")
 
-
 local function createCollisionGroup(name)
 	local success, _ = pcall(function()
 		PhysicsService:CreateCollisionGroup(name)
@@ -24,6 +23,21 @@ createCollisionGroup("NPCs")
 
 PhysicsService:CollisionGroupSetCollidable("Players", "NPCs", false)
 
+local function setPlayerCollisionGroup(player)
+	local character = player.Character or player.CharacterAdded:Wait()
+	for _, part in ipairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CollisionGroup = "Players"
+		end
+	end
+end
+
+-- Set up collision groups for players when they join
+game.Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function()
+		setPlayerCollisionGroup(player)
+	end)
+end)
 
 local function countNPCs()
 	local count = 0
