@@ -1,6 +1,9 @@
 -- NPCShoppingModule.lua
 local NPCShoppingModule = {}
 
+-- Required Modules
+local ProductShelfManager = require(script.Parent.ProductShelfManager)
+
 -- Services
 local PathfindingService = game:GetService("PathfindingService")
 local ChatService = game:GetService("Chat")
@@ -46,6 +49,7 @@ local shopItems = {
 local function createNPCState()
 	return {
 		shoppingList = {},
+		remainingItems = {},
 		isAtCashier = false,
 		currentCashier = nil,
 		npcModel = nil,
@@ -53,6 +57,12 @@ local function createNPCState()
 end
 
 -- Helper functions
+local function positionOrientation(npcModel, targetPart)
+	local humanoidRootPart = npcModel:FindFirstChild("HumanoidRootPart")
+	local orientation = targetPart.CFrame - targetPart.CFrame.Position
+	humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * orientation.Rotation
+end
+
 local function moveToPosition(npcState, targetPosition)
 	local path = PathfindingService:CreatePath({
 		AgentRadius = 2,
@@ -107,9 +117,9 @@ local function moveProductsToCashier(npcState, spot, num)
 	local offset2 = Vector3.new(-0.7, 0, 0)
 	local products = game.ReplicatedStorage:WaitForChild("Products")
 
-	print("Moving products to cashier. Shopping list contains:", #npcState.shoppingList, "items")
+	print("Moving products to cashier. Shopping list contains:", #npcState.remainingItems, "items")
 
-	for i, item in ipairs(npcState.shoppingList) do
+	for i, item in ipairs(npcState.remainingItems) do
 		if spot and spot:IsA("BasePart") and num == 1 then
 			spot.Num.Value += 1
 			local itemDuplicate = products:WaitForChild(item.Name):Clone()
@@ -200,6 +210,8 @@ local function leaveTheStore(npcState)
 					bool.Value = true
 
 					if attemptPathfinding(queuePosition.Position, maxAttempts) then
+						positionOrientation(npcState.npcModel, queuePosition)
+
 						while cashier1Bool.Value and cashier2Bool.Value do
 							task.wait(2)
 							if not npcState.npcModel.Parent then
@@ -232,6 +244,7 @@ local function leaveTheStore(npcState)
 			npcState.currentCashier = 1
 
 			if attemptPathfinding(cashier1.Position, maxAttempts) then
+				positionOrientation(npcState.npcModel, cashier1)
 				moveProductsToCashier(npcState, productSpot1, 1)
 
 				local dispatch = workspace.Caja:WaitForChild("Despachado")
@@ -279,6 +292,7 @@ local function leaveTheStore(npcState)
 			npcState.currentCashier = 2
 
 			if attemptPathfinding(cashier2.Position, maxAttempts) then
+				positionOrientation(npcState.npcModel, cashier2)
 				moveProductsToCashier(npcState, productSpot2, 2)
 
 				local dispatch = workspace.Caja2:WaitForChild("Despachado")
@@ -347,15 +361,23 @@ local function shop(npcState)
 		print(i, item.Name)
 	end
 
-	for _, item in ipairs(npcState.shoppingList) do
+	-- Move to item stand
+	for i, item in ipairs(npcState.shoppingList) do
 		if not moveToPosition(npcState, item.Position) then
 			warn("Failed to move to item:", item.Name)
 			continue
 		end
 		task.wait(0.5)
+
+		if not ProductShelfManager.PurchaseItem(item.Name) then
+			ChatService:Chat(npcState.npcModel.Head, "Dónde es " .. item.Name .. " 😡")
+			continue
+		else
+			table.insert(npcState.remainingItems, item)
+		end
 	end
 
-	if #npcState.shoppingList > 0 then
+	if #npcState.remainingItems > 0 then
 		leaveTheStore(npcState)
 	else
 		warn("Shopping list is empty, NPC leaving store")
