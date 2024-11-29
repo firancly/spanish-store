@@ -4,62 +4,62 @@ local SHELF_CONFIG = {
 	["Carne"] = {
 		maxQuantity = 12,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 12,
 	},
 	["Cereal"] = {
 		maxQuantity = 12,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 12,
 	},
 	["Doritos"] = {
 		maxQuantity = 10,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 10,
 	},
 	["Takis"] = {
 		maxQuantity = 15,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 15,
 	},
 	["Vaselina"] = {
 		maxQuantity = 25,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 25,
 	},
 	["Chips"] = {
 		maxQuantity = 20,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 20,
 	},
 	["Snapple"] = {
 		maxQuantity = 10,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 10,
 	},
 	["Oreo"] = {
 		maxQuantity = 12,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 12,
 	},
 	["Galon"] = {
 		maxQuantity = 20,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 20,
 	},
 	["Desodorante"] = {
 		maxQuantity = 36,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 36,
 	},
 	["Papel"] = {
 		maxQuantity = 20,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 20,
 	},
 	["Vasitos"] = {
 		maxQuantity = 24,
 		restockThreshold = 5,
-		currentQuantity = 1,
+		currentQuantity = 24,
 	},
 }
 
