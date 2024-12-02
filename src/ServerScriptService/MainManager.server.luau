@@ -2,7 +2,7 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local PhysicsService = game:GetService("PhysicsService")
 
-local MAX_NPCS = 4
+local MAX_NPCS = 1
 local SPAWN_DELAY = 2
 local lastSpawnTime = 0
 
