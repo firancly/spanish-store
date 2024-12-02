@@ -112,12 +112,18 @@ function NPCShoppingModule:handleMovingToItem()
 
 	local currentItem = self.shoppingList[1]
 	local itemStands = workspace:WaitForChild("ItemStands")
-	if currentItem.Position == 2 then
-		currentItem.Position = itemStands:FindFirstChild(currentItem.Name).aviso.Position + Vector3.new(2, 0, 0)
-	else
-		currentItem.Position = itemStands:FindFirstChild(currentItem.Name).aviso.Position + Vector3.new(-2, 0, 0)
+	local itemStand = itemStands:FindFirstChild(currentItem.Name)
+
+	if not itemStand then
+		warn("Item stand not found for:", currentItem.Name)
+		table.remove(self.shoppingList, 1)
+		return false
 	end
-	if not safePathfind(self.npc, currentItem.Position) then
+
+	local offsetX = currentItem.Position > 0 and 2 or -2
+	local targetPosition = itemStand.aviso.Position + Vector3.new(offsetX, 0, 0)
+
+	if not safePathfind(self.npc, targetPosition) then
 		table.remove(self.shoppingList, 1)
 		return false
 	end
