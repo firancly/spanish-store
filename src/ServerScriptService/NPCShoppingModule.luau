@@ -72,7 +72,7 @@ function NPCShoppingModule.new(npc)
 end
 
 function NPCShoppingModule:transitionTo(newState)
-	print("Transitioning from", self.currentState, "to", newState)
+	-- print("Transitioning from", self.currentState, "to", newState)
 	self.currentState = newState
 end
 

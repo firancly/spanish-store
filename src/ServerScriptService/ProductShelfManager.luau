@@ -70,8 +70,6 @@ function ProductShelfManager.UpdateTextLabel(productName)
 		return
 	end
 
-	print(productName)
-
 	local itemStands = workspace:WaitForChild("ItemStands")
 	local stand = itemStands:WaitForChild(productName)
 	local textLabel = stand:FindFirstChild("aviso"):FindFirstChild("SurfaceGui"):FindFirstChild("TextLabel")
