@@ -105,7 +105,14 @@ function NPCShoppingModule:handleSelectingItems()
 end
 
 function NPCShoppingModule:handleMovingToItem()
+	warn(#self.shoppingList)
 	if #self.shoppingList == 0 then
+		-- Leave if cart is empty
+		if #self.remainingItems < 1 then
+			safePathfind(self.npc, Dependencies.door.HitBox2.Position)
+			self.npc:Destroy()
+		end
+		-- Move to checkout
 		self:transitionTo(NPCState.LEAVING_STORE)
 		return true
 	end
@@ -142,71 +149,84 @@ function NPCShoppingModule:handlePurchasingItem()
 	else
 		ChatService:Chat(self.npc.Head, "Dónde está " .. currentItem.Name .. " 😡")
 		table.remove(self.shoppingList, 1)
+		self:transitionTo(NPCState.MOVING_TO_ITEM)
 	end
 
 	return true
 end
 
 function NPCShoppingModule:handleLeaving()
+	-- Attempt to process at first cashier
 	if not Dependencies.cashier1Bool.Value then
 		local productSpot1 = workspace:FindFirstChild("productSpot1")
-		if productSpot1 then
-			Dependencies.cashier1Bool.Value = true
-			self.isAtCashier = true
-			self.currentCashier = 1
-
-			if safePathfind(self.npc, Dependencies.cashier1.Position) then
-				local humanoidRootPart = self.npc:FindFirstChild("HumanoidRootPart")
-				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position)
-					* (Dependencies.cashier1.CFrame - Dependencies.cashier1.CFrame.Position).Rotation
-
-				self:moveProductsToCashier(productSpot1, 1)
-
-				local dispatch = workspace.Caja:WaitForChild("Despachado")
-				if self:waitForDispatch(dispatch, 1) then
-					self:clearProductSpot(productSpot1)
-
-					if safePathfind(self.npc, Dependencies.door.HitBox2.Position) then
-						Dependencies.cashier1Bool.Value = false
-						self.npc:Destroy()
-						return true
-					end
-				else
-					self:handleDispatchFailure(productSpot1, 1)
-				end
-			end
+		if not productSpot1 then
+			return self:handleQueueing()
 		end
+
+		Dependencies.cashier1Bool.Value = true
+		self.isAtCashier = true
+		self.currentCashier = 1
+
+		if
+			not self:processCashier(productSpot1, Dependencies.cashier1, workspace.Caja:WaitForChild("Despachado"), 1)
+		then
+			return self:handleQueueing()
+		end
+
+	-- Attempt to process at second cashier
 	elseif not Dependencies.cashier2Bool.Value then
 		local productSpot2 = workspace:FindFirstChild("productSpot2")
-		if productSpot2 then
-			Dependencies.cashier2Bool.Value = true
-			self.isAtCashier = true
-			self.currentCashier = 2
+		if not productSpot2 then
+			return self:handleQueueing()
+		end
 
-			if safePathfind(self.npc, Dependencies.cashier2.Position) then
-				local humanoidRootPart = self.npc:FindFirstChild("HumanoidRootPart")
-				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position)
-					* (Dependencies.cashier2.CFrame - Dependencies.cashier2.CFrame.Position).Rotation
+		Dependencies.cashier2Bool.Value = true
+		self.isAtCashier = true
+		self.currentCashier = 2
 
-				self:moveProductsToCashier(productSpot2, 2)
-
-				local dispatch = workspace.Caja2:WaitForChild("Despachado")
-				if self:waitForDispatch(dispatch, 2) then
-					self:clearProductSpot(productSpot2)
-
-					if safePathfind(self.npc, Dependencies.door.HitBox2.Position) then
-						Dependencies.cashier2Bool.Value = false
-						self.npc:Destroy()
-						return true
-					end
-				else
-					self:handleDispatchFailure(productSpot2, 2)
-				end
-			end
+		if
+			not self:processCashier(productSpot2, Dependencies.cashier2, workspace.Caja2:WaitForChild("Despachado"), 2)
+		then
+			return self:handleQueueing()
 		end
 	end
 
 	return self:handleQueueing()
+end
+
+-- Process cashier interactions
+function NPCShoppingModule:processCashier(productSpot, cashier, dispatch, cashierNumber)
+	if not safePathfind(self.npc, cashier.Position) then
+		return false
+	end
+
+	-- Adjust NPC's orientation at cashier
+	local humanoidRootPart = self.npc:FindFirstChild("HumanoidRootPart")
+	humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position)
+		* (cashier.CFrame - cashier.CFrame.Position).Rotation
+
+	self:moveProductsToCashier(productSpot, cashierNumber)
+
+	if not self:waitForDispatch(dispatch, cashierNumber) then
+		self:handleDispatchFailure(productSpot, cashierNumber)
+		return false
+	end
+
+	self:clearProductSpot(productSpot)
+
+	if not safePathfind(self.npc, Dependencies.door.HitBox2.Position) then
+		return false
+	end
+
+	-- Reset cashier availability and destroy NPC
+	if cashierNumber == 1 then
+		Dependencies.cashier1Bool.Value = false
+	else
+		Dependencies.cashier2Bool.Value = false
+	end
+
+	self.npc:Destroy()
+	return true
 end
 
 -- Helper Methods
