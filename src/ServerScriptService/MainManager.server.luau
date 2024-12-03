@@ -1,6 +1,7 @@
 local ServerStorage = game:GetService("ServerStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RunService = game:GetService("RunService")
+local PhysicsService = game:GetService("PhysicsService")
 
 -- Configuration
 local NPC_SPAWN_FOLDER = ServerStorage:WaitForChild("NPCs")
@@ -16,6 +17,27 @@ local activeNPCs = workspace:WaitForChild("ActiveNPC")
 local function countNPCs()
 	return #activeNPCs:GetChildren()
 end
+
+local playersGroup = PhysicsService:RegisterCollisionGroup("Players")
+local npcsGroup = PhysicsService:RegisterCollisionGroup("NPCs")
+
+PhysicsService:CollisionGroupSetCollidable("Players", "NPCs", false)
+
+local function setPlayerCollisionGroup(player)
+	local character = player.Character or player.CharacterAdded:Wait()
+	for _, part in ipairs(character:GetDescendants()) do
+		if part:IsA("BasePart") then
+			part.CollisionGroup = "Players"
+		end
+	end
+end
+
+-- Set up collision groups for players when they join
+game.Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function()
+		setPlayerCollisionGroup(player)
+	end)
+end)
 
 local function spawnNPC()
 	local npcModels = NPC_SPAWN_FOLDER:GetChildren()
