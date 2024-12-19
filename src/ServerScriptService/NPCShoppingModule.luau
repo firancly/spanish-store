@@ -1,3 +1,4 @@
+-- NPCShoppingModule: Manages NPC shopping behavior in the store.
 local NPCShoppingModule = {}
 
 -- Required Modules
@@ -7,6 +8,7 @@ local ProductShelfManager = require(script.Parent.ProductShelfManager)
 local PathfindingService = game:GetService("PathfindingService")
 local ChatService = game:GetService("Chat")
 
+-- Define NPC States for different shopping stages
 local NPCState = {
 	IDLE = "Idle",
 	ENTERING_STORE = "EnteringStore",
@@ -18,6 +20,7 @@ local NPCState = {
 	LEAVING_STORE = "LeavingStore",
 }
 
+-- Configuration Settings for NPC Shopping Behavior
 local CONFIG = {
 	MAX_SHOPPING_ITEMS = 5,
 	MAX_PATHFIND_ATTEMPTS = 3,
@@ -25,6 +28,7 @@ local CONFIG = {
 	CASHIER_INTERACTION_TIMEOUT = 10,
 }
 
+-- Dependencies for accessing in-game objects
 local Dependencies = {
 	itemStands = nil,
 	queue = nil,
@@ -57,6 +61,7 @@ local function safePathfind(npc, targetPosition)
 	end
 end
 
+-- Create a new NPC shopping instance
 function NPCShoppingModule.new(npc)
 	local self = setmetatable({}, { __index = NPCShoppingModule })
 
@@ -71,11 +76,13 @@ function NPCShoppingModule.new(npc)
 	return self
 end
 
+-- Transition the NPC to a new state
 function NPCShoppingModule:transitionTo(newState)
 	-- print("Transitioning from", self.currentState, "to", newState)
 	self.currentState = newState
 end
 
+-- Handle NPC entering the store
 function NPCShoppingModule:handleEnteringStore()
 	if not safePathfind(self.npc, Dependencies.door.HitBox.Position) then
 		self:transitionTo(NPCState.IDLE)
@@ -86,6 +93,7 @@ function NPCShoppingModule:handleEnteringStore()
 	return true
 end
 
+-- NPC selects random items to purchase
 function NPCShoppingModule:handleSelectingItems()
 	local availableItems = table.clone(Dependencies.shopItems)
 	local itemCount = math.random(1, CONFIG.MAX_SHOPPING_ITEMS)
@@ -104,6 +112,7 @@ function NPCShoppingModule:handleSelectingItems()
 	return true
 end
 
+-- NPC moves to item locations and attempts to purchase
 function NPCShoppingModule:handleMovingToItem()
 	warn(#self.shoppingList)
 	if #self.shoppingList == 0 then
@@ -139,6 +148,7 @@ function NPCShoppingModule:handleMovingToItem()
 	return true
 end
 
+-- NPC attempts to purchase the item
 function NPCShoppingModule:handlePurchasingItem()
 	local currentItem = self.shoppingList[1]
 
@@ -155,6 +165,7 @@ function NPCShoppingModule:handlePurchasingItem()
 	return true
 end
 
+-- NPC leaves the store after checkout or failed shopping
 function NPCShoppingModule:handleLeaving()
 	-- Attempt to process at first cashier
 	if not Dependencies.cashier1Bool.Value then
@@ -230,6 +241,7 @@ function NPCShoppingModule:processCashier(productSpot, cashier, dispatch, cashie
 end
 
 -- Helper Methods
+-- Move products from NPC inventory to the counter
 function NPCShoppingModule:moveProductsToCashier(spot, cashierNum)
 	local offset = cashierNum == 1 and Vector3.new(0.7, 0, 0) or Vector3.new(-0.7, 0, 0)
 	local products = game.ReplicatedStorage.Products
@@ -250,6 +262,7 @@ function NPCShoppingModule:moveProductsToCashier(spot, cashierNum)
 	end
 end
 
+-- Wait for the NPC to be dispatched, ensuring a smooth checkout process
 function NPCShoppingModule:waitForDispatch(dispatch, cashierNum)
 	local maxWaitTime = CONFIG.CASHIER_INTERACTION_TIMEOUT
 	local startTime = tick()
@@ -283,6 +296,7 @@ function NPCShoppingModule:waitForDispatch(dispatch, cashierNum)
 	return true
 end
 
+-- Handle NPC failure to complete dispatch due to timeout or other issues
 function NPCShoppingModule:handleDispatchFailure(productSpot, cashierNum)
 	ChatService:Chat(self.npc.Head, "¡Oye, punk! ¡Acelera!")
 	task.wait(10)
@@ -315,6 +329,7 @@ function NPCShoppingModule:handleDispatchFailure(productSpot, cashierNum)
 	self.npc:Destroy()
 end
 
+-- Clear all products from the checkout spot after transaction or failure
 function NPCShoppingModule:clearProductSpot(productSpot)
 	for _, item in productSpot:GetChildren() do
 		if item:IsA("BasePart") and item.Name ~= "Num" then
@@ -324,6 +339,7 @@ function NPCShoppingModule:clearProductSpot(productSpot)
 	productSpot.Num.Value = 0
 end
 
+-- Manage NPC queueing system to avoid multiple NPCs occupying the same spot
 function NPCShoppingModule:handleQueueing()
 	local booleans = Dependencies.queue.Booleans:GetChildren()
 	for _, bool in booleans do
@@ -363,6 +379,7 @@ function NPCShoppingModule:handleQueueing()
 	return true
 end
 
+-- Update NPC behavior based on its current state
 function NPCShoppingModule:update()
 	local stateHandlers = {
 		[NPCState.ENTERING_STORE] = self.handleEnteringStore,
