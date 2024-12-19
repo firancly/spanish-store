@@ -46,7 +46,7 @@ local function safePathfind(npc, targetPosition)
 
 	if success and path.Status == Enum.PathStatus.Success then
 		local waypoints = path:GetWaypoints()
-		for _, waypoint in ipairs(waypoints) do
+		for _, waypoint in waypoints do
 			npc.Humanoid:MoveTo(waypoint.Position)
 			npc.Humanoid.MoveToFinished:Wait()
 		end
@@ -234,7 +234,7 @@ function NPCShoppingModule:moveProductsToCashier(spot, cashierNum)
 	local offset = cashierNum == 1 and Vector3.new(0.7, 0, 0) or Vector3.new(-0.7, 0, 0)
 	local products = game.ReplicatedStorage.Products
 
-	for i, item in ipairs(self.remainingItems) do
+	for i, item in self.remainingItems do
 		if spot and spot:IsA("BasePart") then
 			spot.Num.Value += 1
 			local itemDuplicate = products:WaitForChild(item.Name):Clone()
@@ -256,7 +256,7 @@ function NPCShoppingModule:waitForDispatch(dispatch, cashierNum)
 
 	dispatch.Value = false
 	local frame = dispatch.Parent.Pantalla.SurfaceGui.Frame
-	for _, label in ipairs(frame:GetChildren()) do
+	for _, label in frame:GetChildren() do
 		if label:IsA("TextLabel") and label.Name ~= "OXXO" then
 			label:Destroy()
 		end
@@ -295,7 +295,7 @@ function NPCShoppingModule:handleDispatchFailure(productSpot, cashierNum)
 
 		local dispatch = workspace.Caja:WaitForChild("Despachado")
 		local frame = dispatch.Parent.Pantalla.SurfaceGui.Frame
-		for _, label in ipairs(frame:GetChildren()) do
+		for _, label in frame:GetChildren() do
 			if label:IsA("TextLabel") and label.Name ~= "OXXO" then
 				label:Destroy()
 			end
@@ -305,7 +305,7 @@ function NPCShoppingModule:handleDispatchFailure(productSpot, cashierNum)
 
 		local dispatch = workspace.Caja2:WaitForChild("Despachado")
 		local frame = dispatch.Parent.Pantalla.SurfaceGui.Frame
-		for _, label in ipairs(frame:GetChildren()) do
+		for _, label in frame:GetChildren() do
 			if label:IsA("TextLabel") and label.Name ~= "OXXO" then
 				label:Destroy()
 			end
@@ -316,7 +316,7 @@ function NPCShoppingModule:handleDispatchFailure(productSpot, cashierNum)
 end
 
 function NPCShoppingModule:clearProductSpot(productSpot)
-	for _, item in ipairs(productSpot:GetChildren()) do
+	for _, item in productSpot:GetChildren() do
 		if item:IsA("BasePart") and item.Name ~= "Num" then
 			item:Destroy()
 		end
@@ -326,7 +326,7 @@ end
 
 function NPCShoppingModule:handleQueueing()
 	local booleans = Dependencies.queue.Booleans:GetChildren()
-	for _, bool in ipairs(booleans) do
+	for _, bool in booleans do
 		if not bool.Value then
 			local positionNum = bool.Name
 			local queuePosition = Dependencies.queue:FindFirstChild(positionNum)
@@ -401,7 +401,7 @@ function NPCShoppingModule.init(npc)
 		{ Name = "Papel", Position = -2 },
 	}
 
-	for _, part in ipairs(npc:GetDescendants()) do
+	for _, part in npc:GetDescendants() do
 		if part:IsA("BasePart") then
 			part.CollisionGroup = "NPCs"
 		end
